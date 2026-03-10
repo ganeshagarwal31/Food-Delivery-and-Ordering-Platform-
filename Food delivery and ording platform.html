@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie Express - Food Delivery And Ordering Platform</title>
+    <style>
+        /* --- CSS STYLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; color: #333; overflow-x: hidden; }
+
+        /* --- LOGIN PAGE STYLES --- */
+        #login-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200') center/cover;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .login-card { background: white; padding: 2.5rem 2rem; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; }
+        .login-card h2 { margin-bottom: 5px; color: #fc8019; font-size: 2rem;}
+        .login-card p { margin-bottom: 20px; color: #686b78; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem;}
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none; font-size: 1rem;}
+        .input-group input:focus { border-color: #fc8019; }
+        .login-btn { width: 100%; padding: 12px; background-color: #fc8019; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; transition: 0.3s;}
+        .login-btn:hover { background-color: #e06d10; }
+
+        /* --- MAIN APP STYLES --- */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #fc8019; cursor: pointer; }
+        
+        .search-container { display: flex; align-items: center; flex-grow: 1; max-width: 400px; margin: 0 20px; }
+        .search-container input { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; outline: none; }
+        .search-container input:focus { border-color: #fc8019; }
+        .search-container button { padding: 8px 15px; background-color: #fc8019; color: white; border: 1px solid #fc8019; border-radius: 0 4px 4px 0; cursor: pointer; font-weight: bold; }
+        
+        .nav-links { display: flex; align-items: center; }
+        .nav-links a { text-decoration: none; color: #3d4152; margin-left: 20px; font-weight: 500; cursor: pointer; transition: 0.3s; }
+        .nav-links a:hover { color: #fc8019; }
+        .user-greeting { margin-left: 20px; font-weight: bold; color: #fc8019; }
+        
+        .cart-section { display: inline-flex; align-items: center; gap: 15px; margin-left: 20px; }
+        .cart-btn { background-color: #fff; color: #3d4152; border: 2px solid #eee; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 5px;}
+        .cart-btn:hover { border-color: #60b246; color: #60b246; }
+
+        .hero { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200') center/cover; height: 300px; display: flex; align-items: center; justify-content: center; color: white; text-align: center; flex-direction: column; }
+        .surprise-btn { background-color: #fc8019; color: white; border: none; padding: 12px 25px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; box-shadow: 0 4px 10px rgba(252, 128, 25, 0.4); }
+        .surprise-btn:hover { transform: scale(1.05); background-color: #e06d10; }
+
+        .container { padding: 2rem 5%; }
+        h2 { margin-bottom: 20px; font-size: 1.8rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+        .filters { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 1px solid #ccc; background: white; border-radius: 20px; cursor: pointer; font-weight: 500; }
+        .filter-btn:hover, .filter-btn.active { background: #3d4152; color: white; border-color: #3d4152; }
+
+        .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .food-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: 0.2s; position: relative;}
+        .food-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.1);}
+        .food-card img { width: 100%; height: 180px; object-fit: cover; }
+        .food-info { padding: 15px; }
+        .food-title { font-size: 1.2rem; font-weight: bold; }
+        .food-restaurant { color: #686b78; font-size: 0.9rem; margin-top: 5px; }
+        .food-category { display: inline-block; background-color: #f1f1f6; padding: 2px 8px; border-radius: 4px; color: #fc8019; font-size: 0.75rem; font-weight: bold; margin-top: 8px; }
+        .food-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .food-price { font-weight: bold; font-size: 1.1rem; }
+        .add-btn { background-color: #fff; color: #fc8019; border: 1px solid #fc8019; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .add-btn:hover { background-color: #fc8019; color: white; }
+
+        /* --- MODAL & TRACKER STYLES --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal { background: white; width: 90%; max-width: 500px; border-radius: 12px; padding: 25px; transform: translateY(-20px); transition: 0.3s; max-height: 80vh; overflow-y: auto;}
+        .modal-overlay.active .modal { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888; }
+        .close-btn:hover { color: #ff4d4f; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px;}
+        .cart-item-info { display: flex; flex-direction: column; }
+        .remove-btn { color: #ff4d4f; background: none; border: none; cursor: pointer; font-size: 0.85rem; margin-top: 5px; text-align: left;}
+        .cart-total { font-size: 1.3rem; font-weight: bold; text-align: right; margin-top: 20px; color: #3d4152; }
+        .checkout-confirm-btn { width: 100%; padding: 12px; background-color: #60b246; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
+        .checkout-confirm-btn:hover { background-color: #4a9334; }
+
+        /* --- PAYMENT STYLES --- */
+        .payment-options { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .payment-method { display: flex; align-items: center; gap: 10px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 500; }
+        .payment-method:hover { border-color: #fc8019; background-color: #fff9f5; }
+        .payment-method input[type="radio"] { accent-color: #fc8019; transform: scale(1.2); }
+
+        .delivery-tracker { position: fixed; bottom: -100px; right: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 1500; border-left: 5px solid #fc8019; width: 320px; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .delivery-tracker.active { bottom: 20px; }
+        .tracker-header { font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between;}
+        .progress-bar { height: 6px; background: #eee; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: #fc8019; width: 0%; transition: width 0.5s linear; }
+
+        footer { background-color: #1a1a1a; color: #fff; padding: 3rem 5% 1.5rem; margin-top: 3rem; }
+        .hidden { display: none !important; }
+        .no-results { grid-column: 1 / -1; text-align: center; padding: 2rem; color: #686b78; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div id="login-page">
+        <div class="login-card">
+            <h2>🍔 Foodie Express</h2>
+            <p>Login to order your favorite food</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="username">Your Name</label>
+                    <input type="text" id="username" required placeholder="e.g. Rahul">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter any password">
+                </div>
+                <button type="submit" class="login-btn">Secure Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <header class="navbar">
+            <div class="logo" onclick="showMenu()">🍔 Foodie Express</div>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for restaurant or dish..." onkeyup="handleEnterKey(event)">
+                <button onclick="searchFood()">Search</button>
+            </div>
+            <div class="nav-links">
+                <span id="user-greeting" class="user-greeting"></span>
+                <a onclick="showMenu()">Menu</a>
+                <a onclick="showHistory()">My Orders</a>
+                <a onclick="logout()" style="color: #ff4d4f;">Logout</a>
+                <div class="cart-section">
+                    <button class="cart-btn" onclick="openCartModal()">
+                        🛒 Cart (<span id="cart-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div id="main-content">
+            <section class="hero">
+                <h1>Craving something delicious?</h1>
+                <p>Meals, snacks, and milkshakes delivered hot & fresh.</p>
+                <button class="surprise-btn" onclick="surpriseMe()">🎲 Surprise Me!</button>
+            </section>
+
+            <main class="container">
+                <h2>Our Menu</h2>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterMenu('All')">All</button>
+                    <button class="filter-btn" onclick="filterMenu('Mains')">Mains</button>
+                    <button class="filter-btn" onclick="filterMenu('Snacks')">Snacks</button>
+                    <button class="filter-btn" onclick="filterMenu('Milkshakes')">Milkshakes</button>
+                </div>
+                <div class="food-grid" id="food-grid"></div>
+            </main>
+
+         <footer>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 30px;">
+        
+        <div>
+            <h3 style="color:#fc8019; margin-bottom:15px;">📞 Contact Us</h3>
+            <p>Foodie Express Pvt. Ltd.</p>
+            <p>📍 Dablipur, India</p>
+            <p>📧 support@foodieexpress.com</p>
+            <p>📱 +91 98765 43210</p>
+            <p>🕒 Open: 10 AM - 11 PM</p>
+        </div>
+
+        <div>
+            <h3 style="color:#fc8019; margin-bottom:15px;">🔗 Quick Links</h3>
+            <p><a href="#" onclick="showMenu()" style="color:#ccc; text-decoration:none;">Home</a></p>
+            <p><a href="#" onclick="showHistory()" style="color:#ccc; text-decoration:none;">My Orders</a></p>
+            <p><a href="#" onclick="openCartModal()" style="color:#ccc; text-decoration:none;">Cart</a></p>
+            <p><a href="#" style="color:#ccc; text-decoration:none;">Privacy Policy</a></p>
+            <p><a href="#" style="color:#ccc; text-decoration:none;">Terms & Conditions</a></p>
+        </div>
+
+        <div>
+            <h3 style="color:#fc8019; margin-bottom:15px;">🌐 Follow Us</h3>
+            <p><a href="https://www.instagram.com" target="_blank" style="color:#ccc; text-decoration:none;">Instagram</a></p>
+            <p><a href="https://www.facebook.com" target="_blank" style="color:#ccc; text-decoration:none;">Facebook</a></p>
+            <p><a href="https://www.twitter.com" target="_blank" style="color:#ccc; text-decoration:none;">Twitter</a></p>
+            <p><a href="https://www.linkedin.com" target="_blank" style="color:#ccc; text-decoration:none;">LinkedIn</a></p>
+        </div>
+
+        <div>
+            <h3 style="color:#fc8019; margin-bottom:15px;">📍 Find Us</h3>
+            <iframe 
+                src="https://maps.google.com/maps?q=Dablipur%20India&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                width="100%" 
+                height="200" 
+                style="border:0; border-radius:8px;" 
+                allowfullscreen="" 
+                loading="lazy">
+            </iframe>
+        </div>
+
+    </div>
+
+    <div style="text-align:center; border-top:1px solid #333; padding-top:15px; color:#777; font-size:0.85rem;">
+        © 2026 Foodie Express. All rights reserved.
+    </div>
+</footer>
+        </div>
+
+        <main class="container hidden" id="history-section">
+            <h2>Your Order History</h2>
+            <div id="history-list">
+                <p style="color: #686b78;">You haven't placed any orders yet.</p>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="cart-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Your Cart 🛒</h2>
+                <button class="close-btn" onclick="closeCartModal()">×</button>
+            </div>
+            <div id="cart-items-container">
+                </div>
+            <div class="cart-total" id="cart-total-display">Total: ₹0</div>
+            <button class="checkout-confirm-btn" onclick="processCheckout()">Confirm & Pay</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Select Payment Method 💳</h2>
+                <button class="close-btn" onclick="closePaymentModal()">×</button>
+            </div>
+            <div class="payment-options">
+                <label class="payment-method">
+                    <input type="radio" name="payment" value="UPI (GPay/PhonePe)" checked>
+                    <span>UPI (GPay, PhonePe, Paytm)</span>
+                </label>
+                <label class="payment-method">
+                    <input type="radio" name="payment" value="Credit / Debit Card">
+                    <span>Credit / Debit Card</span>
+                </label>
+                <label class="payment-method">
+                    <input type="radio" name="payment" value="Cash on Delivery">
+                    <span>Cash on Delivery (COD)</span>
+                </label>
+            </div>
+            <button class="checkout-confirm-btn" onclick="finalizeOrder()">Place Order</button>
+        </div>
+    </div>
+
+    <div class="delivery-tracker" id="delivery-tracker">
+        <div class="tracker-header">
+            <span>Order Status</span>
+            <span id="tracker-time">Just now</span>
+        </div>
+        <div id="tracker-status-text" style="color: #fc8019; font-weight: bold;">Order Received!</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="tracker-progress"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = "";
+        let cart = []; 
+        let orderHistory = []; 
+
+        const foodItems = [
+            // Mains
+            { id: 1, name: "Chicken Biryani", restaurant: "Paradise Biryani", category: "Mains", price: 250, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600" },
+            { id: 2, name: "Margherita Pizza", restaurant: "Domino's Pizza", category: "Mains", price: 199, image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600" },
+            { id: 3, name: "Veg Fried Rice", restaurant: "Mainland China", category: "Mains", price: 180, image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600" },
+            { id: 4, name: "Butter Chicken", restaurant: "Punjab Grill", category: "Mains", price: 320, image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600" },
+            { id: 5, name: "Paneer Tikka Masala", restaurant: "Haldiram's", category: "Mains", price: 280, image: "https://orders.popskitchen.in/storage/2024/09/image-358.png" },
+            { id: 6, name: "Chole Bhature", restaurant: "Bikanervala", category: "Mains", price: 150, image: "https://media.istockphoto.com/id/979914742/photo/chole-bhature-or-chick-pea-curry-and-fried-puri-served-in-terracotta-crockery-over-white.webp?a=1&b=1&s=612x612&w=0&k=20&c=8pmBVIcNb-GIFnsBT0sYqfy-YtzNq7pOqc6lQZgFOPo=" },
+            { id: 7, name: "Masala Dosa", restaurant: "Saravana Bhavan", category: "Mains", price: 120, image: "https://i.ytimg.com/vi/CCab5oh0ZOc/maxresdefault.jpg" },
+            { id: 9, name: "Pasta Alfredo", restaurant: "Truffles", category: "Mains", price: 220, image: "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?auto=format&fit=crop&w=600" },
+            { id: 10, name: "Veg Hakka Noodles", restaurant: "Chowman", category: "Mains", price: 170, image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=600" },
+
+            // Snacks
+            { id: 21, name: "Crispy Samosa", restaurant: "Bikanerwala", category: "Snacks", price: 40, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600" },
+            { id: 22, name: "French Fries", restaurant: "McDonald's", category: "Snacks", price: 90, image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=600" },
+            { id: 23, name: "Loaded Nachos", restaurant: "Taco Bell", category: "Snacks", price: 140, image: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=600" },
+            { id: 24, name: "Cheesy Garlic Bread", restaurant: "Pizza Hut", category: "Snacks", price: 120, image: "https://plus.unsplash.com/premium_photo-1711752902321-ef7b72b28b26?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Z2FybGljJTIwYnJlYWR8ZW58MHx8MHx8fDA%3D" },
+            { id: 25, name: "Aloo Tikki Burger", restaurant: "Burger King", category: "Snacks", price: 85, image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=600" },
+            { id: 27, name: "Pani Puri", restaurant: "Haldiram's", category: "Snacks", price: 60, image: "https://media.istockphoto.com/id/1257507130/photo/three-glasses-of-various-milkshakes-strawberry-chocolate-and-vanilla-milkshake-on-wooden.webp?a=1&b=1&s=612x612&w=0&k=20&c=Gm5815Ths48q9QSCbky3gyIeLoc3kU996bgtrnb84XY=" },
+            { id: 28, name: "Spicy Chicken Wings", restaurant: "KFC", category: "Snacks", price: 199, image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&w=600" },
+            { id: 29, name: "Steamed Veg Momos", restaurant: "Wow! Momo", category: "Snacks", price: 110, image: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?auto=format&fit=crop&w=600" },
+            { id: 30, name: "Pav Bhaji", restaurant: "Kailash Parbat", category: "Snacks", price: 130, image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=600" },
+
+            // Milkshakes
+            { id: 41, name: "Oreo Milkshake", restaurant: "Keventers", category: "Milkshakes", price: 150, image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600" },
+            { id: 42, name: "Cold Coffee", restaurant: "Cafe Coffee Day", category: "Milkshakes", price: 120, image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600" },
+            { id: 43, name: "Thick Chocolate Shake", restaurant: "Frozen Bottle", category: "Milkshakes", price: 170, image: "https://media.istockphoto.com/id/916679868/photo/chocolate-banana-smoothie-with-cinnamon.webp?a=1&b=1&s=612x612&w=0&k=20&c=mfr2fvbZhus_YmPuQTOmaWAhvP65fQgEoGooUlHrO1Y=" },
+            { id: 44, name: "Strawberry Bliss Shake", restaurant: "Keventers", category: "Milkshakes", price: 160, image: "https://media.istockphoto.com/id/1218601272/photo/disposable-cup-of-milkshake-with-drinking-straw-chocolate-chips-and-strawberries-on-napkins.webp?a=1&b=1&s=612x612&w=0&k=20&c=QiNsMjwNra4tSA4oQX9c6gUuoQsfGqreW9zUxEmjI1U=" },
+            { id: 45, name: "Mango Smoothie", restaurant: "Juice Lounge", category: "Milkshakes", price: 140, image: "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=600" },
+            { id: 46, name: "Vanilla Bean Shake", restaurant: "The Thick Shake Factory", category: "Milkshakes", price: 130, image: "https://images.unsplash.com/photo-1662192511709-e75d67367638?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VmFuaWxsYSUyMEJlYW4lMjBTaGFrZXxlbnwwfHwwfHx8MA%3D%3D" },
+            { id: 47, name: "Peanut Butter Shake", restaurant: "Drunken Monkey", category: "Milkshakes", price: 180, image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?auto=format&fit=crop&w=600" },
+            { id: 48, name: "KitKat Crunch Shake", restaurant: "Makers of Milkshakes", category: "Milkshakes", price: 190, image: "https://media.istockphoto.com/id/828078728/photo/milkshake.webp?a=1&b=1&s=612x612&w=0&k=20&c=OlFsrArcQ9W0kL_HxRmhZ311TDiJ1Cf62oGuhkLijMQ=" },
+            { id: 49, name: "Banana Caramel Shake", restaurant: "Keventers", category: "Milkshakes", price: 160, image: "https://images.unsplash.com/photo-1583096114844-06ce5a5f2171?auto=format&fit=crop&w=600" },
+            { id: 50, name: "Brownie Fudge Shake", restaurant: "Frozen Bottle", category: "Milkshakes", price: 210, image: "https://images.unsplash.com/photo-1586917049301-c804fb01f961?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" }
+        ];
+
+        /* --- CORE LOGIC --- */
+        function handleLogin(event) {
+            event.preventDefault(); 
+            currentUser = document.getElementById('username').value;
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('user-greeting').innerText = `Hi, ${currentUser}!`;
+            renderItems(foodItems);
+        }
+
+        function logout() {
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            cart = [];
+            updateCartCount();
+            showMenu(); 
+        }
+
+        function renderItems(itemsToDisplay) {
+            const grid = document.getElementById('food-grid');
+            grid.innerHTML = ''; 
+            if (itemsToDisplay.length === 0) {
+                grid.innerHTML = `<div class="no-results">Sorry, we couldn't find any matches.</div>`;
+                return;
+            }
+            itemsToDisplay.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'food-card';
+                card.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="food-info">
+                        <div class="food-title">${item.name}</div>
+                        <div class="food-restaurant">🏪 ${item.restaurant}</div>
+                        <div class="food-category">${item.category}</div>
+                        <div class="food-bottom">
+                            <div class="food-price">₹${item.price}</div>
+                            <button class="add-btn" onclick="addToCart(${item.id})">ADD</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterMenu(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const filteredItems = category === 'All' ? foodItems : foodItems.filter(item => item.category === category);
+            renderItems(filteredItems);
+        }
+
+        function searchFood() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const searchResults = foodItems.filter(item => item.name.toLowerCase().includes(query) || item.restaurant.toLowerCase().includes(query));
+            showMenu(); 
+            renderItems(searchResults);
+        }
+
+        function handleEnterKey(event) { if (event.key === "Enter") searchFood(); }
+
+        /* --- CART & NEW FEATURES LOGIC --- */
+        
+        function addToCart(itemId) {
+            const item = foodItems.find(f => f.id === itemId);
+            cart.push(item);
+            updateCartCount();
+            
+            // Subtle animation on cart button
+            const cartBtn = document.querySelector('.cart-btn');
+            cartBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            renderCartModalItems(); 
+        }
+
+        function updateCartCount() {
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        function openCartModal() {
+            renderCartModalItems();
+            document.getElementById('cart-modal').classList.add('active');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.remove('active');
+        }
+
+        function renderCartModalItems() {
+            const container = document.getElementById('cart-items-container');
+            const totalDisplay = document.getElementById('cart-total-display');
+            container.innerHTML = '';
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888; padding: 20px 0;">Your cart is empty.</p>';
+                totalDisplay.innerText = 'Total: ₹0';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += item.price;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <strong>${item.name}</strong>
+                            <small>${item.restaurant}</small>
+                            <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+                        </div>
+                        <div class="food-price">₹${item.price}</div>
+                    </div>
+                `;
+            });
+            totalDisplay.innerText = `Total: ₹${total}`;
+        }
+
+        // Modified: Now opens the payment modal instead of finalizing the order immediately
+        function processCheckout() {
+            if (cart.length === 0) {
+                alert("Please add items to your cart first!");
+                closeCartModal();
+                return;
+            }
+            closeCartModal();
+            document.getElementById('payment-modal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.remove('active');
+        }
+
+        // New: Handles the actual placement of the order with the selected payment method
+        function finalizeOrder() {
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            const newOrder = { 
+                id: "ORD-" + Math.floor(Math.random() * 10000), 
+                date: new Date().toLocaleString(), 
+                items: [...cart], 
+                totalAmount: total,
+                paymentMethod: paymentMethod // Saved payment method
+            };
+            
+            orderHistory.unshift(newOrder);
+            cart = []; 
+            updateCartCount();
+            closePaymentModal();
+            showHistory();
+            startDeliveryTracker();
+        }
+
+        function surpriseMe() {
+            const randomIndex = Math.floor(Math.random() * foodItems.length);
+            const randomItem = foodItems[randomIndex];
+            addToCart(randomItem.id);
+            alert(`🎲 Surprise! We added ${randomItem.name} from ${randomItem.restaurant} to your cart!`);
+        }
+
+        function startDeliveryTracker() {
+            const tracker = document.getElementById('delivery-tracker');
+            const statusText = document.getElementById('tracker-status-text');
+            const progressBar = document.getElementById('tracker-progress');
+            
+            tracker.classList.add('active');
+            statusText.innerText = "Order Received & Preparing...";
+            progressBar.style.width = "25%";
+            
+            setTimeout(() => {
+                statusText.innerText = "Food is out for delivery! 🛵";
+                progressBar.style.width = "75%";
+            }, 5000); 
+            
+            setTimeout(() => {
+                statusText.innerText = "Delivered! Enjoy your meal. 😋";
+                progressBar.style.width = "100%";
+                statusText.style.color = "#60b246";
+                
+                setTimeout(() => {
+                    tracker.classList.remove('active');
+                    setTimeout(() => {
+                        progressBar.style.width = "0%";
+                        statusText.style.color = "#fc8019";
+                    }, 1000);
+                }, 4000);
+            }, 10000); 
+        }
+
+        /* --- NAVIGATION & UPDATED HISTORY LOGIC --- */
+        function showMenu() {
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('history-section').classList.add('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function showHistory() {
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('history-section').classList.remove('hidden');
+            const historyList = document.getElementById('history-list');
+            
+            if (orderHistory.length === 0) {
+                historyList.innerHTML = '<p style="color: #686b78;">You haven\'t placed any orders yet.</p>';
+                return;
+            }
+
+            historyList.innerHTML = '';
+            
+            orderHistory.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.style.cssText = "background:white; padding:20px; margin-bottom:15px; border-radius:8px; border-left:5px solid #60b246; box-shadow: 0 4px 10px rgba(0,0,0,0.05);";
+                
+                // Build the list of items for this specific order
+                let itemsHTML = '<div style="margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px;">';
+                order.items.forEach(item => {
+                    itemsHTML += `
+                        <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 8px; color: #555;">
+                            <span>🛒 ${item.name} <span style="color:#888; font-size:0.8rem;">(${item.restaurant})</span></span>
+                            <span>₹${item.price}</span>
+                        </div>
+                    `;
+                });
+                itemsHTML += '</div>';
+
+                // Construct the final card layout, now including the chosen payment method
+                orderCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="font-size: 1.1rem; color: #3d4152;">Order #${order.id}</strong>
+                        <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">✓ Delivered</span>
+                    </div>
+                    <div style="color: #888; font-size: 0.85rem; margin-bottom: 10px;">📅 ${order.date}</div>
+                    <div style="font-weight: bold; font-size: 1.2rem; color: #fc8019;">
+                        Total Paid: ₹${order.totalAmount}
+                        <span style="font-size: 0.9rem; color: #666; font-weight: normal;">(via ${order.paymentMethod || 'N/A'})</span>
+                    </div>
+                    ${itemsHTML}
+                `;
+                
+                historyList.appendChild(orderCard);
+            });
+        }
+    </script>
+</body>
+</html>
